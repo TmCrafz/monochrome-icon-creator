@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Monochrome Icon Creator</string>
+    <string name="btn_create_monochrome">Create</string>
 </resources>

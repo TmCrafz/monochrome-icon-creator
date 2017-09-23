@@ -11,14 +11,24 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/button_createMonoChrome" />
 
     <ImageView
         android:id="@+id/imageViewTest"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@mipmap/ic_launcher"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/button_createMonoChrome"
         android:layout_alignParentStart="true" />
+
+    <Button
+        android:id="@+id/button_createMonoChrome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_create_monochrome"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>

@@ -17,6 +17,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
@@ -31,10 +33,37 @@ public class MainActivity extends Activity {
     private RecyclerView.LayoutManager m_appOverviewLayoutManager;
     private ApplicationOverviewAdapter m_appOverviewAdapter;
 
+    private Button m_btnCreate;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        m_btnCreate = (Button) findViewById(R.id.button_createMonoChrome);
+        m_btnCreate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // We have nothing to do when there is nothing selected
+                if (m_appOverviewAdapter.getSelectionCnt() == 0) {
+                    return;
+                }
+                // Create shortcuts for all selected apps
+                for (ApplicationData appDataIns : m_appData) {
+                    // if app is not selected it is nothing to do
+                    if (!appDataIns.isSelected) {
+                        continue;
+                    }
+                    Drawable monochromeIconDrawable = createMonochromeDrawableFrom(appDataIns.icon);
+                    Bitmap icon = iconDrawableToBitmap(monochromeIconDrawable);
+                    createShortcut(icon, appDataIns.appLabel, appDataIns.packageName);
+                }
+                // Deselect all
+                m_appOverviewAdapter.deselectAll();
+                // Close app
+                finish();
+            }
+        });
 
         PackageManager pm = getPackageManager();
         List<ApplicationInfo> packs = pm.getInstalledApplications(0);
@@ -59,15 +88,11 @@ public class MainActivity extends Activity {
         }
 
         m_recyclerAppOverview = (RecyclerView) findViewById(R.id.recyclerView_appOverview);
+        m_recyclerAppOverview.setHasFixedSize(true);
         m_appOverviewLayoutManager = new LinearLayoutManager(this);
         m_recyclerAppOverview.setLayoutManager(m_appOverviewLayoutManager);
         m_appOverviewAdapter = new ApplicationOverviewAdapter(m_appData, this);
         m_recyclerAppOverview.setAdapter(m_appOverviewAdapter);
-
-        Drawable monochromeIconDrawable = createMonochromeDrawableFrom(m_appData.get(0).icon);
-        m_appData.get(0).icon.setAlpha(30);
-        Bitmap icon = iconDrawableToBitmap(monochromeIconDrawable);
-        createShortcut(icon, m_appData.get(0).appLabel, m_appData.get(0).packageName);
     }
 
     private Drawable createMonochromeDrawableFrom(Drawable drawable) {
@@ -118,5 +143,14 @@ public class MainActivity extends Activity {
         getApplicationContext().sendBroadcast(addShortcutIntent);
     }
 
-
+    @Override
+    public void onBackPressed() {
+        // If there are apps selected, deselect them instead of closing the app. Else close app.
+        if (m_appOverviewAdapter.getSelectionCnt() == 0) {
+            super.onBackPressed();
+        }
+        else {
+            m_appOverviewAdapter.deselectAll();
+        }
+    }
 }
