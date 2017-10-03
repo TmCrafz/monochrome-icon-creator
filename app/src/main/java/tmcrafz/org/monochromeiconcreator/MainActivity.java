@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -112,7 +113,17 @@ public class MainActivity extends Activity {
             return iconBd.getBitmap();
         }
         */
-        Bitmap iconBm = Bitmap.createBitmap(icon.getIntrinsicWidth(), icon.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        int bitmapWidth = icon.getIntrinsicWidth();
+        int bitmapHeight = icon.getIntrinsicHeight();
+        // We have to resize the size if it is to large, so the bitmap size dont get to high and we can
+        // send it as intent
+        if (bitmapWidth > 256 || bitmapHeight > 256) {
+            // Assuming that the size of the sites of an icon has the same length,
+            // there is no need to calculate the aspect ratio
+            bitmapWidth = 256;
+            bitmapHeight = 256;
+        }
+        Bitmap iconBm = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(iconBm);
         icon.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         icon.draw(canvas);
