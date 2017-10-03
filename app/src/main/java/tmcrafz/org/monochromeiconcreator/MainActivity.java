@@ -118,11 +118,18 @@ public class MainActivity extends Activity {
         // We have to resize the size if it is to large, so the bitmap size dont get to high and we can
         // send it as intent
         if (bitmapWidth > 256 || bitmapHeight > 256) {
-            // Assuming that the size of the sites of an icon has the same length,
-            // there is no need to calculate the aspect ratio
-            bitmapWidth = 256;
-            bitmapHeight = 256;
+            // We should keep aspect ratio
+            float ratio = bitmapWidth / bitmapHeight;
+            if (bitmapHeight > bitmapWidth) {
+                bitmapHeight = 256;
+                bitmapWidth = (int) (256.f * ratio);
+            }
+            else {
+                bitmapWidth = 256;
+                bitmapHeight = (int) (256.f / ratio);
+            }
         }
+        // Create the Bitmap with the right site length
         Bitmap iconBm = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(iconBm);
         icon.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
