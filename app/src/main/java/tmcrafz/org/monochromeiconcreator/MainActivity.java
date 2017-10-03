@@ -82,6 +82,8 @@ public class MainActivity extends Activity {
             try {
                 appDataIns.icon = getApplicationContext().getPackageManager().
                         getApplicationIcon(appDataIns.packageName);
+
+                appDataIns.iconMonochrome = createMonochromeDrawableFrom(appDataIns.icon);
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }

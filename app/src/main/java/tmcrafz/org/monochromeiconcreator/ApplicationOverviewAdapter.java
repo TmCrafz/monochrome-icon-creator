@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.tmcrafz.flipiconchecker.FlipIconChecker;
+
 import java.util.List;
 
 public class ApplicationOverviewAdapter extends
@@ -19,14 +21,32 @@ public class ApplicationOverviewAdapter extends
 
     public static class ApplicationOverviewViewHolder extends RecyclerView.ViewHolder {
         private View m_rootLayout;
-        private ImageView m_imageViewIcon;
+        //private ImageView m_imageViewIcon;
+        private FlipIconChecker m_flipIconChecker;
+        private ImageView m_flipIconCheckerFrontView;
+        private ImageView m_flipIconCheckerBackView;
+
         private TextView m_txtName;
 
         public ApplicationOverviewViewHolder(View itemView) {
             super(itemView);
             m_rootLayout = itemView;
-            m_imageViewIcon = (ImageView) itemView.findViewById(R.id.imageView_appIcon);
+            //m_imageViewIcon = (ImageView) itemView.findViewById(R.id.imageView_appIcon);
+            m_flipIconChecker = (FlipIconChecker) itemView.findViewById(R.id.flipChecker_icon);
+            m_flipIconCheckerFrontView = (ImageView)
+                    m_flipIconChecker.getFrontView().findViewById(R.id.imageView_flipIconImage);
+            m_flipIconCheckerBackView = (ImageView)
+                    m_flipIconChecker.getBackView().findViewById(R.id.imageView_flipIconImage);
             m_txtName = (TextView) itemView.findViewById(R.id.txt_appName);
+            /*
+            m_flipIconChecker.setOnFlipIconCheckerClickedListener(
+                    new FlipIconChecker.OnFlipIconCheckerClickedListener() {
+                @Override
+                public void onFlipIconCheckerClicked() {
+
+                }
+            });
+            */
         }
     }
 
@@ -50,27 +70,22 @@ public class ApplicationOverviewAdapter extends
     public void onBindViewHolder(final ApplicationOverviewViewHolder holder, int position) {
         final ApplicationData appDataIns = m_appData.get(position);
         if (appDataIns.icon != null) {
-            holder.m_imageViewIcon.setImageDrawable(appDataIns.icon);
+            // Show the normal icon on front and the monochrom icon on the back (when its checked)
+            holder.m_flipIconCheckerFrontView.setImageDrawable(appDataIns.icon);
+            holder.m_flipIconCheckerBackView.setImageDrawable(appDataIns.iconMonochrome);
         }
         holder.m_txtName.setText(appDataIns.appLabel);
 
-        holder.m_rootLayout.setOnLongClickListener(new View.OnLongClickListener() {
+        holder.m_flipIconChecker.setOnFlipIconCheckerClickedListener(
+                new FlipIconChecker.OnFlipIconCheckerClickedListener() {
             @Override
-            public boolean onLongClick(View view) {
+            public void onFlipIconCheckerClicked() {
                 m_isInSelectionMode = true;
-                handleClick(appDataIns, holder.itemView);
-                return true;
-            }
-        });
-        holder.m_rootLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (m_isInSelectionMode) {
-                    handleClick(appDataIns, holder.itemView);
-                }
+                handleSelectionChange(appDataIns, holder.itemView);
             }
         });
         changeBackroundColor(holder.m_rootLayout, appDataIns.isSelected);
+        holder.m_flipIconChecker.setChecked(appDataIns.isSelected);
     }
 
     @Override
@@ -78,7 +93,7 @@ public class ApplicationOverviewAdapter extends
         return m_appData.size();
     }
 
-    private void handleClick(ApplicationData appDataIns, View rootView) {
+    private void handleSelectionChange(ApplicationData appDataIns, View rootView) {
         appDataIns.isSelected = !appDataIns.isSelected;
         changeBackroundColor(rootView, appDataIns.isSelected);
         if (getSelectionCnt() == 0) {
