@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import org.tmcrafz.flipiconchecker.FlipIconChecker;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ApplicationOverviewAdapter extends
@@ -25,7 +26,6 @@ public class ApplicationOverviewAdapter extends
         private FlipIconChecker m_flipIconChecker;
         private ImageView m_flipIconCheckerFrontView;
         private ImageView m_flipIconCheckerBackView;
-
         private TextView m_txtName;
 
         public ApplicationOverviewViewHolder(View itemView) {
@@ -48,15 +48,25 @@ public class ApplicationOverviewAdapter extends
             });
             */
         }
+
+        public void deselect() {
+            if (m_flipIconChecker.isChecked()) {
+                m_flipIconChecker.changeState();
+            }
+            m_rootLayout.setBackgroundColor(Color.WHITE);
+        }
     }
 
     private Context m_context;
     private List<ApplicationData> m_appData;
+    // The viewholder whiche exists currently in the recyclerview
+    private List<ApplicationOverviewViewHolder> m_currentExistingViewHolder;
     private boolean m_isInSelectionMode = false;
 
     public ApplicationOverviewAdapter(List<ApplicationData> appData, Context context) {
         m_appData = appData;
         m_context = context;
+        m_currentExistingViewHolder = new ArrayList<ApplicationOverviewViewHolder>();
     }
 
     @Override
@@ -64,6 +74,20 @@ public class ApplicationOverviewAdapter extends
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.adapter_recycler_application_overview, parent, false);
         return new ApplicationOverviewViewHolder(itemView);
+    }
+
+    @Override
+    public void onViewAttachedToWindow(ApplicationOverviewViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+        // Add new holder to list
+        m_currentExistingViewHolder.add(holder);
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(ApplicationOverviewViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        // Remove the removed holder from list
+        m_currentExistingViewHolder.remove(holder);
     }
 
     @Override
@@ -86,6 +110,10 @@ public class ApplicationOverviewAdapter extends
         });
         changeBackroundColor(holder.m_rootLayout, appDataIns.isSelected);
         holder.m_flipIconChecker.setChecked(appDataIns.isSelected);
+
+
+
+        //Log.d(TAG, "ADT onBindViewHolder Size: " + mHolderViews.size());
     }
 
     @Override
@@ -119,6 +147,9 @@ public class ApplicationOverviewAdapter extends
         for (ApplicationData appDataIns : m_appData) {
             appDataIns.isSelected = false;
         }
-        notifyDataSetChanged();
+        for (ApplicationOverviewViewHolder holder : m_currentExistingViewHolder) {
+            holder.deselect();
+        }
+        //notifyDataSetChanged();
     }
 }

@@ -11,6 +11,7 @@
         android:id="@+id/flipChecker_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="2dp"
         app:frontView="@layout/flip_icon_checker_view"
         app:backView="@layout/flip_icon_checker_view"
         app:checkView="@layout/flip_icon_checker_view" />
